@@ -1,0 +1,58 @@
+[
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-O",
+            "-Wall",
+            "-m32",
+            "-o",
+            "btest",
+            "tests.c"
+        ],
+        "directory": "/home/woaixiaoxiao/CSAPP/datalab-handout",
+        "file": "tests.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-O",
+            "-Wall",
+            "-m32",
+            "-o",
+            "btest",
+            "btest.c"
+        ],
+        "directory": "/home/woaixiaoxiao/CSAPP/datalab-handout",
+        "file": "btest.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-O",
+            "-Wall",
+            "-m32",
+            "-o",
+            "btest",
+            "decl.c"
+        ],
+        "directory": "/home/woaixiaoxiao/CSAPP/datalab-handout",
+        "file": "decl.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-O",
+            "-Wall",
+            "-m32",
+            "-o",
+            "btest",
+            "bits.c"
+        ],
+        "directory": "/home/woaixiaoxiao/CSAPP/datalab-handout",
+        "file": "bits.c"
+    }
+]
