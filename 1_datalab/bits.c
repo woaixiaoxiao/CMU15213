@@ -164,7 +164,6 @@ int tmin(void) { return 1 << 31; }
  *   Max ops: 10
  *   Rating: 1
  */
-// 关键在于不能用等于，因此一些比较只能配合!来使用
 int isTmax(int x) {
   // 0xffffffff，这一步不能用异或
   int a = x + x + 1;
