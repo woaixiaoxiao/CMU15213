@@ -348,7 +348,7 @@ void do_bgfg(char **argv) {
   // 如果能够走到这里，那么说明已经正确取到对应的job了
   // 唤醒这个job，修改状态
   // 这里没有使用进程组，留坑！
-  kill(job->pid, SIGCONT);
+  kill(-job->pid, SIGCONT);
   job->state = state;
   // 根据bg或者fg进行特定的操作
   if (state == BG) {
@@ -426,7 +426,7 @@ void sigint_handler(int sig) {
   int olderr = errno;
   pid_t pid;
   if ((pid = fgpid(jobs)) != 0) {
-    kill(pid, SIGINT);
+    kill(-pid, SIGINT);
   }
   errno = olderr;
 }
@@ -440,7 +440,7 @@ void sigtstp_handler(int sig) {
   int olderr = errno;
   pid_t pid;
   if ((pid = fgpid(jobs)) != 0) {
-    kill(pid, SIGSTOP);
+    kill(-pid, SIGSTOP);
   }
   errno = olderr;
 }
