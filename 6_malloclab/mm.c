@@ -56,14 +56,14 @@ team_t team = {
 // 获取这个块是否已经被分配
 #define GET_ALLOC(p) (GET(p) & 0x1)
 // 根据空闲块真正的起始位置，找到这个空闲块的头部和尾部
-#define HDRP(bp) ((char *)(bp)-WSIZE)
-#define FTRP(bp) ((char *)(bp) + GET_SIZE(HDRP(bp)) - DSIZE)
+#define HDRP(bp) ((void *)(bp)-WSIZE)
+#define FTRP(bp) ((void *)(bp) + GET_SIZE(HDRP(bp)) - DSIZE)
 // 找到下一块和上一块的起始地址，真正的起始地址，而不是头部或者尾部
 // 一个块真正的起始位置，加上这个块的首部记录的长度，就直接飞到下一块真正的起始位置去了
 // 一个块真正的起始位置，减去上一块的首部记录的上次，直接飞到上一块真正的起始位置去了
-#define HDRP_PRE(bp) ((char *)(bp)-DSIZE)
-#define NEXT_BLKP(bp) ((char *)(bp) + GET_SIZE(HDRP(bp)))
-#define PREV_BLKP(bp) ((char *)(bp)-GET_SIZE(HDRP_PRE(bp)))
+#define HDRP_PRE(bp) ((void *)(bp)-DSIZE)
+#define NEXT_BLKP(bp) ((void *)(bp) + GET_SIZE(HDRP(bp)))
+#define PREV_BLKP(bp) ((void *)(bp)-GET_SIZE(HDRP_PRE(bp)))
 
 /* rounds up to the nearest multiple of ALIGNMENT */
 #define ALIGN(size) (((size) + (ALIGNMENT - 1)) & ~0x7)
@@ -78,11 +78,11 @@ void *segregated_free_lists[LIST_MAX_SIZE];
 // 向p地址指向的块填入地址ptr
 #define SET_PTR(p, ptr) (*(unsigned int *)(p) = (unsigned int)(ptr))
 // 给出前驱和后继结点的地址所在的地址
-#define GET_PRE_PTR(ptr) ((char *)(ptr))
-#define GET_SUCC_PTR(ptr) ((char *)(ptr) + WSIZE)
+#define GET_PRE_PTR(ptr) ((void *)(ptr))
+#define GET_SUCC_PTR(ptr) ((void *)(ptr) + WSIZE)
 // 获得前驱和后继结点
-#define GET_PRE(ptr) (*(char **)(ptr))
-#define GET_SUCC(ptr) (*(char **)(GET_SUCC_PTR(ptr)))
+#define GET_PRE(ptr) (*(void **)(GET_PRE_PTR(ptr)))
+#define GET_SUCC(ptr) (*(void **)(GET_SUCC_PTR(ptr)))
 
 int find_pos(size_t size) {
   int pos = 0;
@@ -237,7 +237,7 @@ int mm_init(void) {
     segregated_free_lists[i] = NULL;
   }
   // 先请求空间来初始化堆的结构
-  static char *heap_listp;
+  void *heap_listp;
   if ((heap_listp = mem_sbrk(4 * WSIZE)) == (void *)(-1)) {
     return -1;
   }
@@ -245,7 +245,6 @@ int mm_init(void) {
   PUT(heap_listp + (1 * WSIZE), PACK(DSIZE, 1));
   PUT(heap_listp + (2 * WSIZE), PACK(DSIZE, 1));
   PUT(heap_listp + (3 * WSIZE), PACK(0, 1));
-  heap_listp += 2 * WSIZE;
   // 为堆申请一个chunksize的虚存空间
   if (extend_heap(CHUNKSIZE) == NULL) {
     return -1;
