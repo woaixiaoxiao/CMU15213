@@ -12,6 +12,8 @@
 #define MAX_OBJECT_SIZE 102400
 #define MAXLINE 8192
 
+#define MAX_CACHE_LINES 10
+
 typedef struct {
   int is_valid;
   char tag[MAXLINE];
@@ -22,7 +24,6 @@ typedef struct {
   sem_t write_lock;
 } cacheline;
 
-#define MAX_CACHE_LINES 10
 cacheline Cache[MAX_CACHE_LINES];
 
 sem_t time_mutex;
@@ -201,7 +202,7 @@ void doit(int fd) {
   char buf[MAXLINE];
   Rio_readlineb(&rio, buf, MAXLINE);
   // printf("Request headers:\n");
-  // printf("%s", buf);
+  printf("%s", buf);
   char method[MAXLINE], uri[MAXLINE], version[MAXLINE];
   // 解析这一行http请求，总共三个部分
   if (sscanf(buf, "%s %s %s", method, uri, version) != 3) {
@@ -217,8 +218,6 @@ void doit(int fd) {
   if (read_cache(fd, uri) != -1) {
     return;
   }
-  char temp_uri[MAXLINE];
-  memcpy(temp_uri, uri, strlen(uri));
   // printf("这次请求的url是: %s \n", uri);
   // 至此，已经完成了对客户端请求的解析，接下来要构造出对服务器的请求
   // 首先解析我们的uri，得到host port path
@@ -248,13 +247,13 @@ void doit(int fd) {
     if (accu_bytes + rec_bytes < MAX_OBJECT_SIZE) {
       strcpy(data + accu_bytes, buf);
       accu_bytes += rec_bytes;
-    } else {
-      accu_bytes = MAX_OBJECT_SIZE;
+    }else{
+      accu_bytes=MAX_OBJECT_SIZE;
     }
   }
   // cache
   if (accu_bytes < MAX_OBJECT_SIZE) {
-    write_cache(temp_uri, data);
+    write_cache(uri, data);
   }
   Close(server_fd);
 }
